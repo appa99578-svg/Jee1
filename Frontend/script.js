@@ -1,65 +1,83 @@
 // ==========================================
-// J.A.R.V.I.S - JAVASCRIPT
+// J.A.R.V.I.S
+// CORE JAVASCRIPT
 // ==========================================
 
-// ------------------------------
+
+// ==========================================
 // ELEMENTS
-// ------------------------------
+// ==========================================
 
-const chat = document.getElementById("chat");
-const msg = document.getElementById("msg");
+const chat =
+    document.getElementById("chat");
 
-const sendBtn = document.getElementById("send");
-const micBtn = document.getElementById("mic-btn");
-const camBtn = document.getElementById("cam-btn");
-const clearBtn = document.getElementById("clear-btn");
+const msg =
+    document.getElementById("msg");
 
-const imgInput = document.getElementById("img-input");
+const sendBtn =
+    document.getElementById("send");
 
-// ------------------------------
-// SETTINGS
-// ------------------------------
+const micBtn =
+    document.getElementById("mic-btn");
 
-const API_KEY = localStorage.getItem("jarvis_key") || "";
+const camBtn =
+    document.getElementById("cam-btn");
 
-const MODELS = [
-    "gemini-3.5-flash",
-    "gemini-3.1-flash-lite",
-    "gemini-flash-latest"
-];
+const clearBtn =
+    document.getElementById("clear-btn");
 
-// ------------------------------
-// MEMORY
-// ------------------------------
+const imgInput =
+    document.getElementById("img-input");
 
-let memory = JSON.parse(
-    localStorage.getItem("jarvis_memory") || "[]"
-);
 
-// ------------------------------
-// ADD MESSAGE
-// ------------------------------
+// ==========================================
+// GEMINI SETTINGS
+// ==========================================
 
-function addMessage(text, type) {
+const MODEL =
+    "gemini-3.5-flash-lite";
 
-    const div = document.createElement("div");
 
-    div.className =
-        "message " +
-        (type === "user"
-            ? "user-message"
-            : "jarvis-message");
+// ==========================================
+// API KEY
+// ==========================================
 
-    div.textContent = text;
+let API_KEY =
+    localStorage.getItem("jarvis_api_key");
 
-    chat.appendChild(div);
 
-    chat.scrollTop = chat.scrollHeight;
+if (!API_KEY) {
+
+    API_KEY = prompt(
+        "Enter your Gemini API Key:"
+    );
+
+    if (API_KEY) {
+
+        localStorage.setItem(
+            "jarvis_api_key",
+            API_KEY.trim()
+        );
+
+    }
+
 }
 
-// ------------------------------
+
+// ==========================================
+// MEMORY
+// ==========================================
+
+let memory = JSON.parse(
+    localStorage.getItem(
+        "jarvis_memory"
+    ) || "[]"
+);
+
+
+// ==========================================
 // SAVE MEMORY
-// ------------------------------
+// ==========================================
 
 function saveMemory() {
 
@@ -67,333 +85,758 @@ function saveMemory() {
         "jarvis_memory",
         JSON.stringify(memory)
     );
+
 }
 
-// ------------------------------
-// SEND MESSAGE
-// ------------------------------
 
-async function sendMessage() {
+// ==========================================
+// ADD MESSAGE
+// ==========================================
 
-    const text = msg.value.trim();
+function addMessage(
+    text,
+    type
+) {
 
-    if (!text) {
-        return;
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    if (type === "user") {
+
+        div.className =
+            "message user-message";
+
+    } else {
+
+        div.className =
+            "message jarvis-message";
+
     }
 
-    addMessage("YOU: " + text, "user");
 
-    msg.value = "";
+    div.textContent = text;
 
-    memory.push({
-        role: "user",
-        text: text
-    });
 
-    saveMemory();
+    chat.appendChild(div);
 
-    addMessage("J.A.R.V.I.S: Thinking...", "jarvis");
 
-    await askGemini(text);
+    chat.scrollTop =
+        chat.scrollHeight;
+
+
+    return div;
+
 }
 
-// ------------------------------
-// GEMINI
-// ------------------------------
 
-async function askGemini(userText) {
+// ==========================================
+// LOAD MEMORY
+// ==========================================
+
+function loadMemory() {
+
+    memory.forEach(
+        item => {
+
+            if (
+                item.role ===
+                "user"
+            ) {
+
+                addMessage(
+                    "YOU: " +
+                    item.text,
+                    "user"
+                );
+
+            }
+
+            if (
+                item.role ===
+                "model"
+            ) {
+
+                addMessage(
+                    "J.A.R.V.I.S: " +
+                    item.text,
+                    "jarvis"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+loadMemory();
+
+
+// ==========================================
+// API REQUEST
+// ==========================================
+
+async function generateContent(
+    contents
+) {
 
     if (!API_KEY) {
 
-        replaceLastMessage(
-            "J.A.R.V.I.S: API key not configured."
+        throw new Error(
+            "Gemini API key is missing."
         );
 
-        return;
     }
 
-    for (const model of MODELS) {
 
-        try {
+    const url =
+        "https://generativelanguage.googleapis.com/v1beta/models/" +
+        MODEL +
+        ":generateContent?key=" +
+        encodeURIComponent(
+            API_KEY
+        );
 
-            const url =
-                "https://generativelanguage.googleapis.com/v1beta/models/" +
-                model +
-                ":generateContent?key=" +
-                encodeURIComponent(API_KEY);
 
-            const body = {
-                contents: [
-                    {
-                        role: "user",
-                        parts: [
-                            {
-                                text:
-                                    "You are J.A.R.V.I.S, a helpful personal AI assistant. " +
-                                    "Answer clearly and simply.\n\n" +
-                                    userText
-                            }
-                        ]
-                    }
-                ]
-            };
+    const response =
+        await fetch(
+            url,
+            {
 
-            const response = await fetch(url, {
                 method: "POST",
 
                 headers: {
-                    "Content-Type": "application/json"
+
+                    "Content-Type":
+                        "application/json"
+
                 },
 
-                body: JSON.stringify(body)
-            });
+                body:
+                    JSON.stringify(
+                        {
+                            contents:
+                                contents
+                        }
+                    )
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                continue;
             }
+        );
 
-            const answer =
-                data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-            if (!answer) {
-                continue;
-            }
+    const data =
+        await response.json();
 
-            replaceLastMessage(
-                "J.A.R.V.I.S: " + answer
-            );
 
-            memory.push({
-                role: "assistant",
-                text: answer
-            });
+    if (!response.ok) {
 
-            saveMemory();
+        throw new Error(
+            data?.error?.message ||
+            "Gemini API request failed."
+        );
 
-            speak(answer);
-
-            return;
-
-        } catch (error) {
-
-            console.error(
-                "Gemini error:",
-                error
-            );
-        }
     }
 
-    replaceLastMessage(
-        "J.A.R.V.I.S: Unable to connect to the AI service."
-    );
+
+    const answer =
+        data
+        ?.candidates
+        ?.[0]
+        ?.content
+        ?.parts
+        ?.[0]
+        ?.text;
+
+
+    if (!answer) {
+
+        throw new Error(
+            "Gemini returned an empty response."
+        );
+
+    }
+
+
+    return answer;
+
 }
 
-// ------------------------------
-// REPLACE LAST MESSAGE
-// ------------------------------
 
-function replaceLastMessage(text) {
+// ==========================================
+// ASK JARVIS
+// ==========================================
 
-    const messages =
-        chat.querySelectorAll(".jarvis-message");
+async function askJarvis(
+    question
+) {
 
-    if (messages.length === 0) {
-        addMessage(text, "jarvis");
+    const thinking =
+        addMessage(
+            "J.A.R.V.I.S: Thinking...",
+            "jarvis"
+        );
+
+
+    try {
+
+        const history =
+            memory
+            .slice(-10)
+            .map(
+                item => ({
+
+                    role:
+                        item.role,
+
+                    parts: [
+                        {
+                            text:
+                                item.text
+                        }
+                    ]
+
+                })
+            );
+
+
+        history.push({
+
+            role: "user",
+
+            parts: [
+                {
+                    text:
+                        question
+                }
+            ]
+
+        });
+
+
+        const answer =
+            await generateContent(
+                history
+            );
+
+
+        thinking.textContent =
+            "J.A.R.V.I.S: " +
+            answer;
+
+
+        memory.push({
+
+            role: "user",
+
+            text: question
+
+        });
+
+
+        memory.push({
+
+            role: "model",
+
+            text: answer
+
+        });
+
+
+        saveMemory();
+
+
+        speak(answer);
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        thinking.textContent =
+            "J.A.R.V.I.S: ERROR - " +
+            error.message;
+
+    }
+
+}
+
+
+// ==========================================
+// SEND
+// ==========================================
+
+async function sendMessage() {
+
+    const text =
+        msg.value.trim();
+
+
+    if (!text) {
+
         return;
+
     }
 
-    messages[messages.length - 1].textContent = text;
+
+    addMessage(
+        "YOU: " + text,
+        "user"
+    );
+
+
+    msg.value = "";
+
+
+    await askJarvis(
+        text
+    );
+
 }
 
-// ------------------------------
-// ENTER KEY
-// ------------------------------
 
-msg.addEventListener("keydown", function (event) {
-
-    if (event.key === "Enter") {
-        sendMessage();
-    }
-
-});
-
-// ------------------------------
+// ==========================================
 // SEND BUTTON
-// ------------------------------
+// ==========================================
 
 sendBtn.addEventListener(
     "click",
     sendMessage
 );
 
-// ------------------------------
-// CLEAR MEMORY
-// ------------------------------
 
-clearBtn.addEventListener(
-    "click",
-    function () {
+// ==========================================
+// ENTER KEY
+// ==========================================
 
-        localStorage.removeItem("jarvis_memory");
+msg.addEventListener(
+    "keydown",
+    function(event) {
 
-        memory = [];
+        if (
+            event.key ===
+            "Enter"
+        ) {
 
-        chat.innerHTML = "";
+            sendMessage();
 
-        addMessage(
-            "J.A.R.V.I.S: Memory cleared.",
-            "jarvis"
-        );
+        }
+
     }
 );
 
-// ------------------------------
-// VOICE INPUT
-// ------------------------------
 
-let recognition = null;
+// ==========================================
+// CLEAR MEMORY
+// ==========================================
+
+clearBtn.addEventListener(
+    "click",
+    function() {
+
+        memory = [];
+
+        localStorage.removeItem(
+            "jarvis_memory"
+        );
+
+
+        chat.innerHTML = "";
+
+
+        addMessage(
+            "SYSTEM: Memory cleared.",
+            "jarvis"
+        );
+
+    }
+);
+
+
+// ==========================================
+// MICROPHONE
+// ==========================================
 
 const SpeechRecognition =
     window.SpeechRecognition ||
     window.webkitSpeechRecognition;
 
+
 if (SpeechRecognition) {
 
-    recognition = new SpeechRecognition();
+    const recognition =
+        new SpeechRecognition();
 
-    recognition.lang = "en-IN";
 
-    recognition.continuous = false;
+    recognition.lang =
+        "en-IN";
 
-    recognition.interimResults = false;
 
-    recognition.onstart = function () {
+    recognition.continuous =
+        false;
 
-        micBtn.textContent = "🔴";
-    };
 
-    recognition.onend = function () {
+    recognition.interimResults =
+        false;
 
-        micBtn.textContent = "🎤";
-    };
 
-    recognition.onresult = function (event) {
+    recognition.onstart =
+        function() {
 
-        const result =
-            event.results[0][0].transcript;
+            micBtn.textContent =
+                "🔴";
 
-        msg.value = result;
+        };
 
-        sendMessage();
-    };
 
-}
+    recognition.onend =
+        function() {
 
-micBtn.addEventListener(
-    "click",
-    function () {
+            micBtn.textContent =
+                "🎤";
 
-        if (!recognition) {
+        };
+
+
+    recognition.onerror =
+        function(event) {
+
+            console.error(
+                "Microphone:",
+                event.error
+            );
+
+            micBtn.textContent =
+                "🎤";
+
+        };
+
+
+    recognition.onresult =
+        function(event) {
+
+            const text =
+                event
+                .results[0][0]
+                .transcript;
+
+
+            msg.value =
+                text;
+
+
+            sendMessage();
+
+        };
+
+
+    micBtn.addEventListener(
+        "click",
+        function() {
+
+            recognition.start();
+
+        }
+    );
+
+} else {
+
+    micBtn.addEventListener(
+        "click",
+        function() {
 
             addMessage(
                 "J.A.R.V.I.S: Voice input is not supported in this browser.",
                 "jarvis"
             );
 
-            return;
         }
+    );
 
-        recognition.start();
-    }
-);
+}
 
-// ------------------------------
+
+// ==========================================
 // TEXT TO SPEECH
-// ------------------------------
+// ==========================================
 
 function speak(text) {
 
-    if (!("speechSynthesis" in window)) {
+    if (
+        !(
+            "speechSynthesis"
+            in window
+        )
+    ) {
+
         return;
+
     }
+
 
     speechSynthesis.cancel();
 
+
     const speech =
-        new SpeechSynthesisUtterance(text);
+        new SpeechSynthesisUtterance(
+            text
+        );
 
-    speech.lang = "en-IN";
 
-    speech.rate = 1;
+    speech.lang =
+        "en-IN";
 
-    speech.pitch = 1;
 
-    speechSynthesis.speak(speech);
+    speech.rate =
+        1;
+
+
+    speech.pitch =
+        0.9;
+
+
+    speechSynthesis.speak(
+        speech
+    );
+
 }
 
-// ------------------------------
-// CAMERA / IMAGE
-// ------------------------------
+
+// ==========================================
+// PHOTO / GALLERY
+// ==========================================
 
 camBtn.addEventListener(
     "click",
-    function () {
+    function() {
+
+        /*
+         IMPORTANT:
+         We DO NOT use:
+
+         capture="environment"
+
+         So Android can show
+         Photos/Gallery picker.
+        */
 
         imgInput.click();
 
     }
 );
 
+
+// ==========================================
+// IMAGE SELECTED
+// ==========================================
+
 imgInput.addEventListener(
     "change",
-    function () {
+    async function() {
 
-        const file = this.files[0];
+        const file =
+            this.files[0];
+
 
         if (!file) {
+
             return;
+
         }
 
-        addMessage(
-            "J.A.R.V.I.S: Image selected. Image analysis requires a vision-capable API setup.",
-            "jarvis"
-        );
 
-        this.value = "";
-    }
-);
-
-// ------------------------------
-// LOAD OLD MEMORY
-// ------------------------------
-
-function loadMemory() {
-
-    if (memory.length === 0) {
-        return;
-    }
-
-    memory.forEach(item => {
-
-        if (item.role === "user") {
+        if (
+            !file.type.startsWith(
+                "image/"
+            )
+        ) {
 
             addMessage(
-                "YOU: " + item.text,
-                "user"
-            );
-
-        } else {
-
-            addMessage(
-                "J.A.R.V.I.S: " + item.text,
+                "J.A.R.V.I.S: Please select an image.",
                 "jarvis"
             );
 
+            return;
+
         }
 
-    });
+
+        addMessage(
+            "YOU: [PHOTO SELECTED]",
+            "user"
+        );
+
+
+        const question =
+            msg.value.trim() ||
+            "Describe this image clearly and simply.";
+
+
+        msg.value = "";
+
+
+        await analyzeImage(
+            file,
+            question
+        );
+
+
+        /*
+         Reset input so the
+         same photo can be selected again.
+        */
+
+        this.value = "";
+
+    }
+);
+
+
+// ==========================================
+// IMAGE ANALYSIS
+// ==========================================
+
+async function analyzeImage(
+    file,
+    question
+) {
+
+    const thinking =
+        addMessage(
+            "J.A.R.V.I.S: Analyzing image...",
+            "jarvis"
+        );
+
+
+    try {
+
+        const base64 =
+            await fileToBase64(
+                file
+            );
+
+
+        const contents = [
+
+            {
+
+                role: "user",
+
+                parts: [
+
+                    {
+                        text:
+                            question
+                    },
+
+                    {
+
+                        inline_data: {
+
+                            mime_type:
+                                file.type,
+
+                            data:
+                                base64
+
+                        }
+
+                    }
+
+                ]
+
+            }
+
+        ];
+
+
+        const answer =
+            await generateContent(
+                contents
+            );
+
+
+        thinking.textContent =
+            "J.A.R.V.I.S: " +
+            answer;
+
+
+        speak(answer);
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        thinking.textContent =
+            "J.A.R.V.I.S: IMAGE ERROR - " +
+            error.message;
+
+    }
+
 }
 
-loadMemory();
+
+// ==========================================
+// FILE -> BASE64
+// ==========================================
+
+function fileToBase64(
+    file
+) {
+
+    return new Promise(
+        function(
+            resolve,
+            reject
+        ) {
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function() {
+
+                    const result =
+                        reader.result;
+
+
+                    const base64 =
+                        result.split(
+                            ","
+                        )[1];
+
+
+                    resolve(
+                        base64
+                    );
+
+                };
+
+
+            reader.onerror =
+                function() {
+
+                    reject(
+                        new Error(
+                            "Could not read image."
+                        )
+                    );
+
+                };
+
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
+    );
+
+}
