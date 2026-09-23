@@ -1,104 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>J.A.R.V.I.S</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
+    <meta
+        name="theme-color"
+        content="#000000"
+    >
+
+    <title>J.A.R.V.I.S - Personal AI Assistant</title>
+
+    <!-- JARVIS CSS -->
+    <link rel="stylesheet" href="./style.css?v=3">
 </head>
 
 <body>
 
-    <header>
+    <!-- HEADER -->
+    <header class="header">
+
         <h1>J.A.R.V.I.S</h1>
+
         <p>PERSONAL AI ASSISTANT</p>
+
     </header>
 
-    <!-- JARVIS CORE -->
-    <div class="core">
-        <div class="ring ring-one"></div>
-        <div class="ring ring-two"></div>
-        <div class="ring ring-three"></div>
 
-        <div class="core-center"></div>
-    </div>
+    <!-- ARC REACTOR -->
+    <section class="core-section">
 
-    <div class="system-ready">
-        SYSTEM READY
-    </div>
+        <div class="core">
 
-    <!-- DIAGNOSTICS -->
+            <div class="ring ring-one"></div>
+
+            <div class="ring ring-two"></div>
+
+            <div class="ring ring-three"></div>
+
+            <div class="core-center"></div>
+
+        </div>
+
+        <div class="system-ready">
+            SYSTEM READY
+        </div>
+
+    </section>
+
+
+    <!-- SYSTEM DIAGNOSTICS -->
     <section class="diagnostics">
 
         <h2>SYSTEM DIAGNOSTICS</h2>
 
         <div class="status-row">
             <span>AI ENGINE</span>
-            <strong>OPERATIONAL</strong>
+            <strong>● OPERATIONAL</strong>
         </div>
 
         <div class="status-row">
             <span>CONNECTION</span>
-            <strong>ONLINE</strong>
+            <strong>● ONLINE</strong>
         </div>
 
         <div class="status-row">
             <span>VOICE INTERFACE</span>
-            <strong>READY</strong>
+            <strong>● READY</strong>
         </div>
 
         <div class="status-row">
             <span>LONG-TERM MEMORY</span>
-            <strong>ACTIVE</strong>
+            <strong>● ACTIVE</strong>
         </div>
 
     </section>
 
+
     <!-- CHAT -->
-    <section class="chat-container">
+    <section class="chat-box">
 
-        <div id="chat" class="chat"></div>
+        <div
+            id="chat"
+            class="chat"
+        ></div>
 
-        <div class="input-area">
+    </section>
 
-            <input
-                id="msg"
-                type="text"
-                placeholder="Enter a command for J.A.R.V.I.S..."
-                autocomplete="off"
+
+    <!-- INPUT -->
+    <section class="controls">
+
+        <input
+            id="msg"
+            type="text"
+            placeholder="Enter a command for J.A.R.V.I.S..."
+            autocomplete="off"
+        >
+
+        <div class="buttons">
+
+            <button
+                id="send"
+                type="button"
             >
+                EXECUTE
+            </button>
 
-            <button id="send">SEND</button>
-
-            <button id="mic-btn" type="button" aria-label="Voice input">
+            <button
+                id="mic-btn"
+                type="button"
+                aria-label="Voice input"
+            >
                 🎤
             </button>
 
-            <button id="cam-btn" type="button" aria-label="Image input">
+            <button
+                id="cam-btn"
+                type="button"
+                aria-label="Choose photo"
+            >
                 📷
             </button>
 
-            <button id="clear-btn" type="button">
+            <button
+                id="clear-btn"
+                type="button"
+            >
                 CLEAR MEMORY
             </button>
 
-            <input
-                type="file"
-                id="img-input"
-                accept="image/*"
-                capture="environment"
-                hidden
-            >
-
         </div>
+
+
+        <!-- IMPORTANT:
+             NO capture="environment"
+             So phone opens Photos/Gallery picker.
+        -->
+
+        <input
+            id="img-input"
+            type="file"
+            accept="image/*"
+            hidden
+        >
 
     </section>
 
-    <!-- JavaScript -->
-    <script src="script.js"></script>
+
+    <!-- JARVIS JAVASCRIPT -->
+    <script src="./script.js?v=3"></script>
 
 </body>
+
 </html>
