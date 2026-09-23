@@ -1,1 +1,17 @@
 
+<button id="send">SEND</button>
+
+<button id="mic-btn" aria-label="Activate voice input">🎤</button>
+
+<button id="clear-btn">CLEAR MEMORY</button>
+
+<button id="cam-btn" aria-label="Analyze image">📷</button>
+
+<input
+type="file"
+id="img-input"
+accept="image/*"
+capture="environment"
+style="display: none;"
+
+>
