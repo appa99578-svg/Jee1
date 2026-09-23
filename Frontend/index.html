@@ -1,90 +1,104 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>J.A.R.V.I.S</title>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-```
-<header>
-    <h1>J.A.R.V.I.S</h1>
-    <p>PERSONAL AI ASSISTANT</p>
-</header>
+    <header>
+        <h1>J.A.R.V.I.S</h1>
+        <p>PERSONAL AI ASSISTANT</p>
+    </header>
 
-<div class="core">
-    <div class="ring r1"></div>
-    <div class="ring r2"></div>
-    <div class="center"></div>
-</div>
+    <!-- JARVIS CORE -->
+    <div class="core">
+        <div class="ring ring-one"></div>
+        <div class="ring ring-two"></div>
+        <div class="ring ring-three"></div>
 
-<p class="core-text">SYSTEM READY</p>
-
-<div class="status">
-    <h2>SYSTEM DIAGNOSTICS</h2>
-
-    <div class="row">
-        <span>AI ENGINE</span>
-        <b class="on">OPERATIONAL</b>
+        <div class="core-center"></div>
     </div>
 
-    <div class="row">
-        <span>CONNECTION</span>
-        <b class="on">ONLINE</b>
+    <div class="system-ready">
+        SYSTEM READY
     </div>
 
-    <div class="row">
-        <span>VOICE INTERFACE</span>
-        <b class="on">READY</b>
-    </div>
+    <!-- DIAGNOSTICS -->
+    <section class="diagnostics">
 
-    <div class="row">
-        <span>LONG-TERM MEMORY</span>
-        <b class="on">ACTIVE</b>
-    </div>
-</div>
+        <h2>SYSTEM DIAGNOSTICS</h2>
 
-<div class="chat" id="chat"></div>
+        <div class="status-row">
+            <span>AI ENGINE</span>
+            <strong>OPERATIONAL</strong>
+        </div>
 
-<div class="input-area">
+        <div class="status-row">
+            <span>CONNECTION</span>
+            <strong>ONLINE</strong>
+        </div>
 
-    <input
-        id="msg"
-        type="text"
-        placeholder="Enter a command for J.A.R.V.I.S..."
-    >
+        <div class="status-row">
+            <span>VOICE INTERFACE</span>
+            <strong>READY</strong>
+        </div>
 
-    <button id="send">SEND</button>
+        <div class="status-row">
+            <span>LONG-TERM MEMORY</span>
+            <strong>ACTIVE</strong>
+        </div>
 
-    <button id="mic-btn" aria-label="Activate voice input">
-        🎤
-    </button>
+    </section>
 
-    <button id="cam-btn" aria-label="Analyze image">
-        📷
-    </button>
+    <!-- CHAT -->
+    <section class="chat-container">
 
-    <button id="clear-btn">
-        CLEAR MEMORY
-    </button>
+        <div id="chat" class="chat"></div>
 
-    <input
-        id="img-input"
-        type="file"
-        accept="image/*"
-        capture="environment"
-        style="display:none"
-    >
+        <div class="input-area">
 
-</div>
+            <input
+                id="msg"
+                type="text"
+                placeholder="Enter a command for J.A.R.V.I.S..."
+                autocomplete="off"
+            >
 
-<script src="script.js"></script>
-```
+            <button id="send">SEND</button>
+
+            <button id="mic-btn" type="button" aria-label="Voice input">
+                🎤
+            </button>
+
+            <button id="cam-btn" type="button" aria-label="Image input">
+                📷
+            </button>
+
+            <button id="clear-btn" type="button">
+                CLEAR MEMORY
+            </button>
+
+            <input
+                type="file"
+                id="img-input"
+                accept="image/*"
+                capture="environment"
+                hidden
+            >
+
+        </div>
+
+    </section>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
 
 </body>
 </html>
-
